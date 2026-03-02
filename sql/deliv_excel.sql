@@ -1,0 +1,26 @@
+SELECT
+    C49_REPORT_DAT        AS "REPORT_DATE",
+    C1__1DMO              AS "DMO",
+    C8_TRADE_TYPE2        AS "TRADE_TYPE2",
+    C12_TNUM_XREF         AS "TNUM_XREF",
+    C82_TNUMGROUP         AS "TNUMGROUP",
+    C79_GROUP_DSC2        AS "GROUP_DSC2",
+    C37_TRADER_NAME       AS "TRADER_NAME",
+    C2_BOOK               AS "BOOK",
+    C16_BUY_SELL          AS "TRADE_BS",
+    C50_ZKEY              AS "ZKEY",
+    C17_TRADE_DATE        AS "TRADE_DATE",
+    C19_CPTY,
+    RTRIM(C47_CPTY_DESCR) AS "CPTY_DESCR",
+    C40_STRIKE            AS "STRIKE",
+    C11_TRADE_PRICE       AS "TRADE_PRICE",
+    RTRIM(C26__MKT)       AS "MKT",
+    RTRIM(C0__CDY)        AS "YEAR",
+    RTRIM(C81_LOCATION_DESCRIPTION) AS "LOCATION_DESCR",
+    RTRIM(C75_STATFULL)   AS "STATFULL",
+    C34_DEL_DATEEND       AS "DEL_DATEEND",
+    C51__AMT              AS "AMOUNT",
+    RTRIM(C77_STAMP_4)    AS "4STAMP",
+    RTRIM(C38_MEMO_1)     AS "MEMO"
+FROM tracrisk.zphysicaldeliveries
+WHERE C0__CDY >= TO_CHAR(TRUNC(sysdate), 'yyyy') - 4;

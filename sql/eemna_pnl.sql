@@ -1,0 +1,74 @@
+DECLARE @ASOFDATE DATETIME;
+SET
+    @ASOFDATE =
+    (
+        SELECT TOP (1) ASOFDATE
+        FROM [MidOfficeReporting].[Zainet].[Engie_Dates]
+        ORDER BY ASOFDATE DESC
+    );
+
+SELECT
+    A.AS_OF_DATE,
+    A.BOOK_ATTR4,
+    A.BOOK_ATTR6,
+    A.BOOK_ATTR7,
+    A.BOOK_ACCTSUB4,
+    A.CPTY,
+    A.BOOK,
+    A.MKT1 AS MARKET,
+    A.COMP1 AS YEAR,
+    A.TRADER,
+    A.GROUP_DSC1,
+    A.GROUP_DSC2,
+    A.GROUP_DSC3,
+    A.TRADER_BOOK,
+    A.PL_DAILY,
+    A.PL_DAILY_NPV,
+    A.PL_DAILY_NPV_NET_C,
+    A.PL_WTD,
+    A.PL_WTD_NPV,
+    A.PL_WTD_NPV_NET_C,
+    A.PL_MTD,
+    A.PL_MTD_NPV,
+    A.PL_MTD_NPV_NET_C,
+    A.PL_QTD,
+    A.PL_QTD_NPV,
+    A.PL_QTD_NPV_NET_C,
+    A.PL_YTD,
+    A.PL_YTD_NPV,
+    A.PL_YTD_NPV_NET_C,
+    A.PL_DELTA1,
+    A.PL_DELTA2,
+    A.PL_GAMMA1,
+    A.PL_GAMMA2,
+    A.PL_VEGA1,
+    A.PL_VEGA2,
+    A.PL_THETA,
+    A.PL_NEWTRADE_NPV,
+    A.PL_VOIDTRADE_NPV,
+    A.PL_INCEP_NPV_NET_C,
+    A.PL_OTHER,
+    A.PL_INCEP_NPV,
+    A.PL_FEE,
+    A.PL_RESERVE,
+    A.PL_COMMISSION,
+    A.NOTIONAL_QTY,
+    CASE
+        WHEN A.MKT1 = 'RESRVE' THEN 'RESERVE'
+        WHEN A.COMP1 LIKE '20%' THEN 'REC'
+        ELSE 'OTHER'
+    END AS ATTRIBUTE,
+    CASE
+        WHEN A.AS_OF_DATE = @ASOFDATE THEN 'YES'
+        ELSE 'NO'
+    END AS LATEST
+FROM [MidOfficeReporting].[Zainet].[Engie_PL_Summary1] AS A
+WHERE A.BOOK IN (
+    'HMMK', 'HPBW', 'RRHY', 'HPHM', 'HREC', 'REWL', 'TREC', 'GREC', 'HPDS',
+    'HPLO', 'HPPD', 'HPPS', 'TPPS', 'HPTN', 'HPIS', 'RPWR', 'ROWN', 'TMAC',
+    'HNAT', 'HNEP', 'HNYK', 'HPLU', 'HPJR', 'HPLK', 'HSPL', 'HAVW', 'HPSV',
+    'RHDG', 'HPSB'
+)
+AND A.BOOK_ATTR4 IN ('REC_S', 'REC_W', 'ERC_REC_LT')
+AND A.AS_OF_DATE = @ASOFDATE
+AND A.BOOK_ATTR7 IN ('POWERDESK', 'PW_OFFTAKE');
