@@ -4,6 +4,8 @@ import pyodbc
  # %%
 vol_books = ['HNAT','HPHM','HREC','TREC']
 
+northeast_books = ['HNEP',"HNYK","HPHM","HPJR","HREC","TREC"]
+
 server = 'eemnaproddb'
 database = 'MidOfficeReporting'
 driver = '{ODBC Driver 17 for SQL Server}'   # or 18 depending on your system
@@ -52,6 +54,12 @@ mapping_loc = 'M:\Dept\TESI\Supply\Position Management\REC\POWER BI\Curve Mappin
 mapping_df = pd.read_excel(mapping_loc, sheet_name='ALIGNE')
 pos_df = pos_df.merge(mapping_df, on = 'MARKET', how='left')
 
+# %%
+# make dictionaries to store positions
+pos_dict = {}
+pos_nd = {}
+
+
 
 # %%
 # filter position df for BOOK in vol_books, ISO not equal to NYISO, PJM, or NEPOOL and SOURCE not equal to CP
@@ -59,17 +67,29 @@ filt = (pos_df['BOOK'].isin(vol_books)) & (~pos_df['ISO'].isin(['NYISO', 'PJM', 
 vol_book = pos_df[filt].copy(deep = True)
 
 #make a pivot table where index is TYPE, column is YEAR, values is sum of DELTA_ND. 
-vol_pivot = vol_book.pivot_table(index='TYPE', columns='YEAR', values='DELTA', aggfunc='sum')
-vol_nd = vol_book.pivot_table(index='TYPE', columns='YEAR', values='DELTA_ND', aggfunc='sum')
+pos_dict['voluntary'] = vol_book.pivot_table(index='TYPE', columns='YEAR', values='DELTA', aggfunc='sum')
+pos_nd['voluntary'] = vol_book.pivot_table(index='TYPE', columns='YEAR', values='DELTA_ND', aggfunc='sum')
 # %%
 #add a total row for each year, and a colum total for each type
-vol_pivot.loc['Total'] = vol_pivot.sum()
-vol_pivot['Total'] = vol_pivot.sum(axis=1)
-vol_pivot.to_clipboard()
+vol_pivot = pos_dict['voluntary']
+pos_dict['voluntary'].loc['Total'] = pos_dict['voluntary'].sum()
+pos_dict['voluntary']['Total'] = pos_dict['voluntary'].sum(axis=1)  
 
-vol_nd.loc['Total'] = vol_nd.sum()
-vol_nd['Total'] = vol_nd.sum(axis=1)
-vol_nd.to_clipboard()
+pos_nd['voluntary'].loc['Total'] = pos_nd['voluntary'].sum()
+pos_nd['voluntary']['Total'] = pos_nd['voluntary'].sum(axis=1)
+
+
+# %%
+######################################################### make pjm position 
+
+
+
+filt = (pos_df['BOOK'].isin(northeast_books)) & (pos_df['ISO'].isin([ 'PJM'])) 
+pjm_book = pos_df[filt].copy(deep = True)
+pos_dict['PJM'] = pjm_book.pivot_table(index=['TYPE','MAPPING'], columns='YEAR', values='DELTA', aggfunc='sum')
+pos_nd['PJM'] = pjm_book.pivot_table(index=['TYPE','MAPPING'], columns='YEAR', values='DELTA_ND', aggfunc='sum')
+
+
 
 # %%
 
@@ -113,4 +133,5 @@ pos_level_pnl.merge(mapping_df, left_on = "MKT1", right_on = 'MARKET', how='left
 pos_df.to_clipboard()
 # %%
 
-mapping_df.to_clipboard()
+pos_dict['voluntary'].to_clipboard()
+# %%
